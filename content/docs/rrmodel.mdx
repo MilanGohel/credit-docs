@@ -2,7 +2,7 @@
 title: Request-Response Model
 ---
 
-The following is how requests and responses will show up while integrating Aarthik Labs Credit SDK:
+We will be communicating data through web-hooks, call-backs, and events in a specific request and response model format. The following is how requests and responses will show up while integrating Aarthik Labs Credit SDK:
 
 ## Request
 
@@ -992,6 +992,8 @@ This is a frequent status update (via web-hooks, call-backs, events) for disburs
             other_upfront_charges: // *Example:* `100`,
             insurance_charges: // *Example:* `100`,
             other_charges: // *Example:* `1000`,
+            last_installment_date: // *Example:* `2026-02-05T00:00:00Z`,
+            last_installment_status: // *Example:* "PAID" | "OVERDUE",
             installments: [
               {
                 serial_number: 1 (can be 1 to X, where X = no. of installments),
