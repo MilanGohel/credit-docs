@@ -17,7 +17,7 @@ export function baseOptions(): BaseLayoutProps {
       enabled: true,
       title: "Credit SDK by Aarthik Labs",
       transparentMode: "top",
-      children: <AuthAction />,
+      // children: <AuthAction />,
     },
   };
 }
