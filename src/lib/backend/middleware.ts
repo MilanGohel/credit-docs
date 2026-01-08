@@ -2,6 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
+  if (process.env.NEXT_PUBLIC_DISABLE_AUTH === "true") {
+    return NextResponse.next({ request });
+  }
+
   let backendResponse = NextResponse.next({
     request,
   });

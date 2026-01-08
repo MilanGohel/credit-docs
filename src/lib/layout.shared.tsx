@@ -3,6 +3,8 @@ import { createClient } from "./backend/server";
 import { SignOutButton } from "./components/sign-out-button";
 
 async function AuthAction() {
+  if (process.env.NEXT_PUBLIC_DISABLE_AUTH === "true") return null;
+
   const backend = await createClient();
   const { data, error } = await backend.auth.getClaims();
   if (error || !data?.claims) return null;
