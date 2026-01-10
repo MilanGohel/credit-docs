@@ -68,10 +68,29 @@ Recommended:
 
 Most integrations standardize on one of these:
 
-- `Authorization: Bearer <API_KEY>`
-- `X-API-Key: <API_KEY>`
+- `Authorization: Bearer API_KEY`
+- `X-API-Key: API_KEY`
 
 Use whichever your dashboard/API reference specifies.
+
+## Bootstrap token mint (SDK integrations)
+
+Your backend mints a short-lived bootstrap token for the SDK:
+
+Request:
+- `POST /api/tenants/{tenant_id}/applications/{application_id}/auth/bootstrap`
+Headers:
+- `x-api-key: API_KEY`
+Body:
+```json
+{ "allowed_parent_origin": "https://app.yourcompany.com" }
+```
+
+The `allowed_parent_origin` must match your allowlisted origin. Keep it server-defined.
+
+<Callout type="info" title="Non-SDK flows">
+See [Tenant Onboarding Guide](./docs/tenant-onboarding) for exchange, provisioning, journey selection, refresh, and logout endpoints.
+</Callout>
 
 ## Environment separation
 

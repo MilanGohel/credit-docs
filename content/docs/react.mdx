@@ -38,11 +38,7 @@ export function ApplyForLoan() {
 
   async function onClick() {
     // Fetch bootstrap token from YOUR backend
-    const res = await fetch("/api/credit/bootstrap-token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ borrowerReference: "borrower_123" }),
-    });
+    const res = await fetch("/api/credit/bootstrap-token", { method: "POST" });
 
     const data = await res.json();
     setBootstrapToken(data.bootstrap_token);
@@ -53,21 +49,23 @@ export function ApplyForLoan() {
       title="Apply for a loan"
       fullscreen="mobile-only"
       triggerProperties={{
-        label: "Apply for a loan",
-        // In many integrations you'll fetch the token first:
-        // If you want token minted BEFORE open, do it in a custom trigger.
+        component: (
+          <button className="px-4 py-2 rounded-md border" onClick={onClick}>
+            Apply for a loan
+          </button>
+        ),
       }}
-      // In production, you should pass bootstrapToken into the SDK so the iframe
-      // can load the correct journey context.
-      // bootstrapToken={bootstrapToken}
+      // Pass bootstrapToken into the SDK so the iframe can load the correct
+      // journey context.
+      bootstrapToken={bootstrapToken ?? undefined}
     />
   );
 }
 ```
 
-<Callout type="warn" title="This example assumes a token-capable embed">
-If your current build doesn’t yet accept a `bootstrapToken` prop, add it — it’s the cleanest contract.
-The token should be consumed by the SDK to build the iframe URL or securely message it into the iframe.
+<Callout type="info" title="SDK handles the auth lifecycle">
+Once you pass `bootstrapToken`, the SDK handles exchange, refresh, provisioning, and journey selection.
+For manual flows, see [Tenant Onboarding Guide](./docs/tenant-onboarding).
 </Callout>
 
 ## Trigger customization

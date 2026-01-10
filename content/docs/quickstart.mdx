@@ -19,10 +19,22 @@ yarn add @aarthiklabs/credit-sdk
 
 ## 2) Get your keys
 
-From the dashboard, you’ll create:
+From Aarthik you’ll receive:
 
-* An **Application** (for environment + allowlist + webhooks + theming)
-* A **API_KEY** (server-only)
+* tenant_id
+* application_id
+* API key (server-only)
+* Base URL (hosted): https://credit.aarthiklabs.com
+
+You must provide:
+
+* Your parent origin (example: https://app.yourcompany.com)
+
+Ensure this origin is allowlisted; it will be sent as `allowed_parent_origin` when minting bootstrap tokens.
+
+<Callout type="info" title="Self-hosted or local API?">
+See [Tenant Onboarding Guide](./docs/tenant-onboarding) for required env vars and local bootstrap setup.
+</Callout>
 
 <Callout type="warning" title="Never expose the API_KEY in the browser">
 If the API_KEY appears in your frontend bundle, your integration is compromised.
@@ -38,7 +50,7 @@ Your backend should expose a minimal endpoint like:
 This endpoint:
 
 1. Validates the borrower identity (your auth)
-2. Calls Aarthik’s Bootstrap Token API using the API_KEY (server-to-server)
+2. Calls Aarthik’s Bootstrap Token API using the API key (server-to-server)
 3. Returns `{ bootstrap_token }` to the frontend
 
 ### Example: Next.js App Router Route Handler
@@ -53,43 +65,37 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
-    const body = await req.json();
+    // 1) Server-to-server: call Aarthik Credit API using API key
+    const baseUrl =
+      process.env.AARTHIK_API_BASE_URL ?? "https://credit.aarthiklabs.com";
+    const apiKey = process.env.AARTHIK_API_KEY;
+    const tenantId = process.env.AARTHIK_TENANT_ID;
+    const applicationId = process.env.AARTHIK_APPLICATION_ID;
+    const allowedParentOrigin = process.env.AARTHIK_ALLOWED_PARENT_ORIGIN;
 
-    // 1) Validate input (keep it strict)
-    // You control what you send — avoid PII if not required.
-    const borrowerReference = body?.borrowerReference;
-    if (!borrowerReference || typeof borrowerReference !== "string") {
-      return NextResponse.json({ error: "Invalid borrowerReference" }, { status: 400 });
-    }
-
-    // 2) Server-to-server: call Aarthik Credit API using API_KEY
-    const baseUrl = process.env.AARTHIK_CREDIT_API_BASE_URL;
-    const secretKey = process.env.AARTHIK_CREDIT_API_KEY;
-
-    if (!baseUrl || !secretKey) {
+    if (!apiKey || !tenantId || !applicationId || !allowedParentOrigin) {
       return NextResponse.json(
         { error: "Missing server configuration" },
         { status: 500 }
       );
     }
 
-    // NOTE: The exact endpoint path is intentionally omitted from SDK docs.
-    // Use the dashboard-provided API reference for the correct URL.
-    const res = await fetch(`${baseUrl}/<BOOTSTRAP_TOKEN_ENDPOINT>`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Either of these are commonly supported:
-        "Authorization": `Bearer ${secretKey}`,
-        // "X-API-Key": secretKey,
-      },
-      body: JSON.stringify({
-        borrowerReference,
-        // optionally: journeyReference, returnUrl, metadata, etc.
-      }),
-    });
+    // Keep allowed_parent_origin server-defined. Do not accept it from clients.
+    const res = await fetch(
+      `${baseUrl}/api/tenants/${tenantId}/applications/${applicationId}/auth/bootstrap`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          allowed_parent_origin: allowedParentOrigin,
+        }),
+      }
+    );
 
     if (!res.ok) {
       const text = await res.text().catch(() => "");
@@ -122,9 +128,8 @@ export async function POST(req: Request) {
 }
 ```
 
-<Callout type="info" title="Why the endpoint path is hidden here">
-This page is **SDK integration documentation**. It intentionally avoids publishing internal/public API surface details.
-Your dashboard/API reference can expose the exact paths privately (or behind auth).
+<Callout type="info" title="Need the full API flow?">
+See [Tenant Onboarding Guide](./docs/tenant-onboarding) for manual exchange, provisioning, journey selection, refresh, and logout steps.
 </Callout>
 
 ## 4) Frontend: open the lending journey

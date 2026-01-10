@@ -41,8 +41,43 @@ description: Common integration failures and how to fix them fast.
 
 ✅ Fix:
 - Verify environment selection
-- Ensure `Authorization: Bearer <API_KEY>` (or the expected header)
+- Ensure `Authorization: Bearer API_KEY` (or the expected header)
 - Rotate keys if compromised
+
+## 401 TOKEN_EXPIRED
+
+**Likely cause:** access token expired.
+
+✅ Fix:
+- Call the refresh endpoint and retry the request.
+
+## 401 TOKEN_REUSED
+
+**Likely cause:** refresh token reused or session revoked.
+
+✅ Fix:
+- Re-bootstrap and start a new session.
+
+## 403 Origin not allowed
+
+**Likely cause:** `allowed_parent_origin` does not match the allowlisted origin.
+
+✅ Fix:
+- Update the origin allowlist and ensure `allowed_parent_origin` matches exactly.
+
+## CORS errors in the browser
+
+**Likely cause:** your parent origin is not allowlisted.
+
+✅ Fix:
+- Ask Aarthik to allowlist your origin and pass the same `allowed_parent_origin` when minting bootstrap tokens.
+
+## 429 Rate limited
+
+**Likely cause:** too many requests in a short window.
+
+✅ Fix:
+- Implement backoff/retry and contact Aarthik support to adjust limits if needed.
 
 ## “Works on desktop but not on mobile”
 

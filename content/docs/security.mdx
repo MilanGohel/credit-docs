@@ -40,6 +40,9 @@ Make sure your dashboard has:
 - Staging origin allowlist
 - Production origin allowlist
 
+When minting bootstrap tokens, set `allowed_parent_origin` to your allowlisted parent origin.
+Keep this value server-defined; do not accept it from the browser.
+
 ## Token transport rules
 
 - Bootstrap Token can be sent to the browser but should be treated like a password:
@@ -47,6 +50,15 @@ Make sure your dashboard has:
   - Mint it just-in-time
 
 - Access/Refresh tokens should remain inside the iframe application storage boundary.
+
+## postMessage origin checks (manual iframe embeds)
+
+If you embed the iframe manually (no SDK), enforce strict origin checks on both sides:
+
+- Parent only accepts messages from the iframe origin
+- Iframe only accepts messages from the parent origin
+
+See [Tenant Onboarding Guide](./docs/tenant-onboarding) for the v1 postMessage envelope and handshake sequence.
 
 ## Browser and mobile WebViews
 
