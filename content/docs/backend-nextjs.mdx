@@ -11,7 +11,9 @@ Create a server route in your app, for example:
 import { NextResponse } from "next/server";
 
 type TypeOfSessionRequest = {
-  contactNumber?: string | null;
+  borrowerProviderID: string;
+  contactNumber: string;
+  pan?: string | null;
 };
 
 type TypeOfPlatformSessionResponse = {
@@ -26,13 +28,23 @@ type TypeOfPlatformSessionResponse = {
 
 export async function POST(request: Request) {
   try {
-    const payload = (await request.json().catch(() => null)) as TypeOfSessionRequest | null;
+    const payload = (await request
+      .json()
+      .catch(() => null)) as TypeOfSessionRequest | null;
+    const borrowerProviderID = payload?.borrowerProviderID?.trim();
     const contactNumber = payload?.contactNumber?.trim();
+    const pan = payload?.pan?.trim();
 
+    if (!borrowerProviderID) {
+      return NextResponse.json(
+        { error: "Missing borrowerProviderID." },
+        { status: 400 },
+      );
+    }
     if (!contactNumber) {
       return NextResponse.json(
         { error: "Missing contactNumber." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,7 +54,7 @@ export async function POST(request: Request) {
     if (!platformBaseURL || !platformAPIKey) {
       return NextResponse.json(
         { error: "Platform configuration missing." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -52,7 +64,11 @@ export async function POST(request: Request) {
         Authorization: `Bearer ${platformAPIKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ contactNumber }),
+      body: JSON.stringify({
+        borrowerProviderID,
+        contactNumber,
+        ...(pan ? { pan } : {}),
+      }),
       cache: "no-store",
     });
 
@@ -60,7 +76,7 @@ export async function POST(request: Request) {
       const errorPayload = await response.json().catch(() => ({}));
       return NextResponse.json(
         { error: "Platform session failed.", details: errorPayload },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -78,7 +94,8 @@ export async function POST(request: Request) {
 ```
 
 <Callout type="warning" title="Keep the API key on the server">
-Never expose `PLATFORM_API_KEY` to the browser. The frontend should only receive the `embedUrl`.
+  Never expose `PLATFORM_API_KEY` to the browser. The frontend should only
+  receive the `embedUrl`.
 </Callout>
 
 ## Environment variables

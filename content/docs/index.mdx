@@ -9,7 +9,7 @@ The hosted experience lets you embed a full loan journey inside your app using a
 
 ## Integration at a glance
 
-- Backend (server-only): `POST /api/loan-journeys/session` calls the platform `POST /api/lab/sessions` with `Authorization: Bearer sk_*` and returns `embedUrl`.
+- Backend (server-only): `POST /api/loan-journeys/session` calls the platform `POST /api/lab/sessions` with `Authorization: Bearer sk_*`, `borrowerProviderID`, and `contactNumber` (`pan` optional), then returns `embedUrl`.
 - Frontend (client): calls your backend and renders `<iframe src={embedUrl}>`.
 
 <Callout type="warning" title="Allowlist required">

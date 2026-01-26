@@ -9,8 +9,9 @@ We will be communicating data through webhooks, callbacks, and events in a speci
 ```json
 {
   API_KEY: string; // This will go in as a header. API Key shall be provided by Aarthik Labs.
-  contact_number?: string; // This should be provided for brand new borrowers.
-  borrower_provider_id?: string; // This should be provided in the request for existing borrowers.
+  borrower_provider_id: string; // Required. Tenant-provided borrower identifier.
+  contact_number: string; // Required. E.164 format accepted (+91 only).
+  pan?: string; // Optional. Permanent Account Number (PAN).
 };
 ```
 

@@ -6,28 +6,34 @@ description: Common hosted experience issues and quick fixes.
 ## Iframe is blank or blocked
 
 **Likely causes:**
+
 - Embed domain not allow-listed in `embed_domains`
 - CSP blocks `frame-ancestors` or `frame-src`
 
 ✅ Fix:
+
 - Allow-list your domain for the application
 - Update CSP to allow the platform domain in `frame-src`
 
-## Backend returns 400 (Missing contactNumber)
+## Backend returns 400 (Missing borrowerProviderID or contactNumber)
 
-**Likely cause:** `contactNumber` is empty or malformed.
+**Likely cause:** `borrowerProviderID` or `contactNumber` is empty or malformed.
 
 ✅ Fix:
+
+- Validate and pass a non-empty `borrowerProviderID`
 - Validate and pass a non-empty `contactNumber` (E.164 format recommended)
 
 ## Backend returns 401/403 from the platform
 
 **Likely causes:**
+
 - Wrong API key (test vs live)
 - Key revoked or rotated
 - Wrong platform base URL
 
 ✅ Fix:
+
 - Verify `PLATFORM_API_KEY` and `PLATFORM_BASE_URL`
 - Rotate keys if compromised
 
@@ -36,14 +42,17 @@ description: Common hosted experience issues and quick fixes.
 **Likely cause:** the `embedUrl` contains a short-lived bootstrap token.
 
 ✅ Fix:
+
 - Call your backend again to mint a fresh session and render a new `embedUrl`
 
 ## Camera or microphone not available
 
 **Likely causes:**
+
 - Missing iframe permissions
 - Non-HTTPS origin
 
 ✅ Fix:
+
 - Add `allow="camera; microphone; clipboard-read; clipboard-write"`
 - Serve the host app over HTTPS

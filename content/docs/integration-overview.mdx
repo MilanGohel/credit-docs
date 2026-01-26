@@ -9,7 +9,7 @@ This is the minimal, production-grade integration for a customer using Next.js (
 
 ### Backend (server-only): `POST /api/loan-journeys/session`
 
-- Receives `contactNumber` from the frontend.
+- Receives `borrowerProviderID` and `contactNumber` from the frontend (`pan` optional).
 - Calls the platform `POST /api/lab/sessions` with `Authorization: Bearer sk_*`.
 - Returns `embedUrl` (optionally `sessionToken`, but the frontend does not need it).
 
@@ -33,7 +33,7 @@ sequenceDiagram
   participant Platform as Aarthik Platform
   participant Journey as Hosted Journey (iframe)
 
-  CustomerFE->>CustomerBE: POST /api/loan-journeys/session (contactNumber)
+  CustomerFE->>CustomerBE: POST /api/loan-journeys/session (borrowerProviderID, contactNumber, pan?)
   CustomerBE->>Platform: POST /api/lab/sessions (Bearer sk_*)
   Platform-->>CustomerBE: { embedUrl, sessionToken }
   CustomerBE-->>CustomerFE: { embedUrl }
