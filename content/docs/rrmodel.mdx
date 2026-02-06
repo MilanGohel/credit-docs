@@ -6,14 +6,80 @@ We will be communicating data through webhooks, callbacks, and events in a speci
 
 ## Request
 
+### `POST /api/lab/sessions` request format
+
+`API_KEY` will go in as a `Authorization: Bearer ${API_KEY}` header.
+
+Use `application/json` with these top-level keys:
+
+- `borrowerProviderID` (required)
+- `profile` (object)
+- `workProfile` (object)
+- `address` (object)
+
+Legacy shape (`borrowerProviderID` + `contactNumber` + optional `pan`) should be treated as deprecated.
+
 ```json
 {
-  API_KEY: string; // This will go in as a header. API Key shall be provided by Aarthik Labs.
-  borrower_provider_id: string; // Required. Tenant-provided borrower identifier.
-  contact_number: string; // Required. E.164 format accepted (+91 only).
-  pan?: string; // Optional. Permanent Account Number (PAN).
-};
+  "borrowerProviderID": "BORROWER-123",
+  "profile": {
+    "contactNumber": "9876543210",
+    "pan": "ABCDE1234F",
+    "panName": "Rahul Sharma",
+    "dob": "1995-06-20",
+    "gender": "male",
+    "personalemail": "rahul@example.com"
+  },
+  "workProfile": {
+    "officialemail": "rahul@company.com",
+    "employmentType": "salaried",
+    "income": "75000",
+    "companyName": "Acme Pvt Ltd",
+    "udyamNumber": null
+  },
+  "address": {
+    "addressL1": "Flat 301, Sunrise Heights",
+    "addressL2": "MG Road",
+    "city": "Bengaluru",
+    "state": "Karnataka",
+    "pincode": "560001"
+  }
+}
 ```
+
+### cURL example
+
+```bash
+curl --request POST "${PLATFORM_BASE_URL}/api/lab/sessions" \
+  --header "Authorization: Bearer ${PLATFORM_API_KEY}" \
+  --header "Content-Type: application/json" \
+  --data-raw '{
+    "borrowerProviderID": "BORROWER-123",
+    "profile": {
+      "contactNumber": "9876543210",
+      "pan": "ABCDE1234F"
+    },
+    "workProfile": {
+      "employmentType": "salaried",
+      "income": "75000",
+      "companyName": "Acme Pvt Ltd",
+      "officialemail": "rahul@company.com"
+    },
+    "address": {
+      "addressL1": "Flat 301, Sunrise Heights",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "pincode": "560001"
+    }
+  }'
+```
+
+### Notes
+
+- `borrowerProviderID` is mandatory.
+- `profile.contactNumber` is mandatory.
+- `workProfile.employmentType` must be `salaried` or `selfEmployed`.
+- `workProfile.udyamNumber` is only valid for `selfEmployed`.
 
 ## Response
 
