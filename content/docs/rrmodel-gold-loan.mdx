@@ -3,27 +3,23 @@ title: Request-Response Model (Gold Loan)
 description: Gold Loan request-response model for hosted journey integrations.
 ---
 
-# Request-Response Model
-
-Credit SDK by Aarthik Labs
-
-## Scope
-This is the Gold Loan request-response model for hosted journey integrations. It follows the same integration style as Personal Loan Journey.
+This document defines the Gold Loan request-response model for hosted journey integrations.
+It follows the same integration style as the Personal Loan journey and adds Gold Loan-specific request fields and response snapshots.
 
 ## Request
 
-### `POST /api/lab/sessions` request format
+### `POST /api/lab/sessions` Request Format
 - Send API key in `Authorization: Bearer ${PLATFORM_API_KEY}`.
 - Use `Content-Type: application/json`.
 - Top-level request keys:
-  - `borrowerProviderID` (required)
+  - `borrowerProviderID` (required; must remain stable per mobile number)
   - `journeyType` (required, must be `GOLD_LOAN`)
   - `profile` (required with mandatory profile fields)
   - `workProfile` (optional)
   - `address` (optional)
   - `goldLoan` (optional but strongly recommended)
 
-### Basic initialization
+### Basic Initialization
 ```json
 {
   "borrowerProviderID": "BORROWER-123",
@@ -34,7 +30,7 @@ This is the Gold Loan request-response model for hosted journey integrations. It
 }
 ```
 
-### Extended initialization (recommended)
+### Extended Initialization (Recommended)
 ```json
 {
   "borrowerProviderID": "BORROWER-123",
@@ -61,21 +57,21 @@ This is the Gold Loan request-response model for hosted journey integrations. It
     "state": "Karnataka",
     "pincode": "560001"
   },
-  "goldLoan": {
-    "userType": "individual",
-    "constitution": null,
-    "jewelleryWeightGrams": 52,
-    "purity": "22K",
-    "endUse": "medicalTreatmentAndEmergencies",
-    "bureauConsent": true,
-    "aaID": "9876543210@finvu",
-    "requestedAmount": "400000",
-    "requestedTenureMonths": 5
+  goldLoan: {
+    userType: "individual",
+    constitution: null,
+    jewelleryWeightGrams: 52,
+    purity: 22K,
+    endUse: "medicalTreatmentAndEmergencies",
+    bureauConsent: true,
+    aaID: 9876543210@finvu,
+    requestedAmount: 400000,
+    requestedTenureMonths: 5
   }
 }
 ```
 
-## Request Schema
+### Request Schema
 
 | Field | Type | Required | Accepted values / Notes |
 |---|---|---|---|
@@ -111,20 +107,31 @@ This is the Gold Loan request-response model for hosted journey integrations. It
 | `goldLoan.requestedAmount` | `string \| number` | No | Requested loan amount |
 | `goldLoan.requestedTenureMonths` | `number \| string` | No | Requested tenure in months |
 
-## Borrower Identity Mapping (Important)
+### Borrower Identity Mapping (Important)
 `borrowerProviderID` is your permanent borrower identity key.
 
-Maintain a stable 1:1 mapping:
+Maintain a stable 1:1 mapping between:
 - `mobile number` ↔ `borrowerProviderID`
 
-If this changes for the same mobile number, the platform may treat the borrower as new, which can break resume continuity and post-disbursal tracking.
+#### Example
+If mobile number `8000352223` is initialized with:
+- `borrowerProviderID = 1234`
 
-## Canonical Normalization
+then every future session for the same mobile number must continue to send:
+- `borrowerProviderID = 1234`
+
+#### What Happens If This Changes?
+If you send a different ID for the same mobile number, the platform may treat the borrower as new. This can break resume continuity and post-disbursal tracking.
+
+#### Integration Rule
+Always send the same `borrowerProviderID` for the same mobile number across all sessions.
+
+### Canonical Normalization
 - `gender` normalizes to: `male`, `female`, `transgender`
 - `employmentType` normalizes to: `salaried`, `selfEmployed`
 - `purity` should be sent in canonical uppercase tokens, for example `22K`
 
-## cURL examples
+### cURL Examples
 ```bash
 curl --request POST "${PLATFORM_BASE_URL}/api/lab/sessions" \
   --header "Authorization: Bearer ${PLATFORM_API_KEY}" \
@@ -149,16 +156,16 @@ curl --request POST "${PLATFORM_BASE_URL}/api/lab/sessions" \
       "contactNumber": "9876543210",
       "pan": "ABCDE1234F"
     },
-    "goldLoan": {
-      "jewelleryWeightGrams": 52,
-      "purity": "22K",
-      "endUse": "businessExpansion",
-      "bureauConsent": true
+    goldLoan: {
+      jewelleryWeightGrams: 52,
+      purity: "22K",
+      endUse: "businessExpansion",
+      bureauConsent: true
     }
   }'
 ```
 
-## Notes
+### Notes
 - `borrowerProviderID` is mandatory.
 - `journeyType = GOLD_LOAN` is mandatory for Gold Loan session creation.
 - `profile.contactNumber` is mandatory.
@@ -166,8 +173,8 @@ curl --request POST "${PLATFORM_BASE_URL}/api/lab/sessions" \
 
 ## Response
 
-### Journey snapshots via postMessage
-The hosted journey posts updates to the parent window. Validate origin and forward to your backend if required.
+### Journey Snapshots via postMessage
+The hosted journey posts snapshot updates to the parent window. Validate origin and forward to your backend if required.
 
 ```tsx
 "use client";
@@ -194,27 +201,29 @@ export function useJourneySnapshots() {
 }
 ```
 
-Validate `event.origin` strictly. Snapshot payloads may contain PII.
+<Callout type="warning" title="Validate origin and protect PII">
+Always validate `event.origin` strictly. Snapshot payloads may contain sensitive borrower data.
+</Callout>
 
-## Common Response Envelope
+### Common Response Envelope
 ```json
 {
-  "tenant_id": "TENANT_ID",
-  "application_id": "APPLICATION_ID",
-  "borrower": {
-    "id": "AL_BORROWER_ID",
-    "tenant_id": "TENANT_ID",
-    "application_id": "APPLICATION_ID",
-    "provider_id": "BORROWER-123",
-    "profile": {
-      "Personal": {
-        "contactNumber": "+919876543210"
+  tenant_id: "TENANT_ID",
+  application_id: "APPLICATION_ID",
+  borrower: {
+    id: "AL_BORROWER_ID",
+    tenant_id: "TENANT_ID",
+    application_id: "APPLICATION_ID",
+    provider_id: "BORROWER-123",
+    profile: {
+      Personal: {
+        contactNumber: "+919876543210"
       },
-      "Work": {},
-      "Address": {},
-      "GoldLoan": {}
+      Work: {},
+      Address: {},
+      GoldLoan: {}
     },
-    "journeys": []
+    journeys: []
   }
 }
 ```
@@ -224,7 +233,7 @@ Validate `event.origin` strictly. Snapshot payloads may contain PII.
 - `journeys[].lenders[].locations[]`: branch/serviceability options exposed by the lender.
 - `journeys[].fulfillments[]`: operational execution objects (selected location, assigned agent, current execution state).
 
-## 1. Journey Started
+### 1. Journey Started
 ```json
 {
   tenant_id: string; // Tenant ID shall be provided by AL
@@ -261,7 +270,7 @@ Validate `event.origin` strictly. Snapshot payloads may contain PII.
 }
 ```
 
-## 2. Application Data Collected
+### 2. Application Data Collected
 ```json
 {
   tenant_id: string; // Tenant ID shall be provided by AL
@@ -294,16 +303,16 @@ Validate `event.origin` strictly. Snapshot payloads may contain PII.
         state: // *Example:* `Gujarat`,
         pincode: // *Example:* `360001`,
       },
-      "GoldLoan": {
-        "userType": "individual",
-        "constitution": null,
-        "jewelleryWeightGrams": 52,
-        "purity": "22K",
-        "endUse": "medicalTreatmentAndEmergencies",
-        "bureauConsent": true,
-        "aaID": "9876543210@finvu",
-        "requestedAmount": "400000",
-        "requestedTenureMonths": 5
+      GoldLoan: {
+        userType: individual,
+        constitution: null,
+        jewelleryWeightGrams: 52,
+        purity: 22K,
+        endUse: medicalTreatmentAndEmergencies,
+        bureauConsent: true,
+        aaID: 9876543210@finvu,
+        requestedAmount: 400000,
+        requestedTenureMonths: 5
       }
     },
      journeys: [
@@ -328,7 +337,7 @@ Validate `event.origin` strictly. Snapshot payloads may contain PII.
 }
 ```
 
-## 3. Offered
+### 3. Offered
 If no offer is received, `offers` will be an empty array and status is `NOT_OFFERED`.
 
 ```json
@@ -363,16 +372,16 @@ If no offer is received, `offers` will be an empty array and status is `NOT_OFFE
         state: // *Example:* `Gujarat`,
         pincode: // *Example:* `360001`,
       },
-      "GoldLoan": {
-        "userType": "individual",
-        "constitution": null,
-        "jewelleryWeightGrams": 52,
-        "purity": "22K",
-        "endUse": "medicalTreatmentAndEmergencies",
-        "bureauConsent": true,
-        "aaID": "9876543210@finvu",
-        "requestedAmount": "400000",
-        "requestedTenureMonths": 5
+      GoldLoan: {
+        userType: individual,
+        constitution: null,
+        jewelleryWeightGrams: 52,
+        purity: 22K,
+        endUse: medicalTreatmentAndEmergencies,
+        bureauConsent: true,
+        aaID: 9876543210@finvu,
+        requestedAmount: 400000,
+        requestedTenureMonths: 5
       }
     },
 journeys: [
@@ -507,7 +516,7 @@ journeys: [
 };
 ```
 
-### No-offer case
+#### No-Offer Case
 ```json
 {
   tenant_id: string; // Tenant ID shall be provided by AL
@@ -540,16 +549,16 @@ journeys: [
         state: // *Example:* `Gujarat`,
         pincode: // *Example:* `360001`,
       },
-      "GoldLoan": {
-        "userType": "individual",
-        "constitution": null,
-        "jewelleryWeightGrams": 52,
-        "purity": "22K",
-        "endUse": "medicalTreatmentAndEmergencies",
-        "bureauConsent": true,
-        "aaID": "9876543210@finvu",
-        "requestedAmount": "400000",
-        "requestedTenureMonths": 5
+      GoldLoan: {
+        userType: individual,
+        constitution: null,
+        jewelleryWeightGrams: 52,
+        purity: 22K,
+        endUse: medicalTreatmentAndEmergencies,
+        bureauConsent: true,
+        aaID: 9876543210@finvu,
+        requestedAmount: 400000,
+        requestedTenureMonths: 5
       }
     },
     journeys: [
@@ -595,7 +604,7 @@ journeys: [
 };
 ```
 
-## 4. Offer Selected
+### 4. Offer Selected
 ```json
 {
   tenant_id: string; // Tenant ID shall be provided by AL
@@ -750,7 +759,7 @@ journeys: [
 
 ```
 
-## 5. Offer Accepted
+### 5. Offer Accepted
 ```json
 {
   tenant_id: string; // Tenant ID shall be provided by AL
@@ -833,7 +842,7 @@ journeys: [
             lender_customer_support_email: // Support email. *Example:* `support@lenderxyz.com`,
           },
         ],
-        
+
         offers: [ // Offer array may be updated with the revised offer amount (borrower preferred).
           {
             id: // Internal offer record ID. *Example:* `8D8AC610-566D-4EF0-9C22-186B2A5ED793`,
@@ -881,7 +890,7 @@ journeys: [
 };
 ```
 
-## 6. Lender Redirected
+### 6. Lender Redirected
 ```json
 {
   tenant_id: string; // Tenant ID shall be provided by AL
@@ -972,7 +981,7 @@ journeys: [
             lender_customer_support_email: // Support email. *Example:* `support@lenderxyz.com`,
           },
         ],
-       
+
         offers: [ // Offer array may be updated with the revised offer amount (borrower preferred).
           {
             id: // Internal offer record ID. *Example:* `8D8AC610-566D-4EF0-9C22-186B2A5ED793`,
@@ -1020,7 +1029,7 @@ journeys: [
 };
 ```
 
-## 8. Collections Update
+### 8. Collections Update
 Frequent post-disbursal event for installment state updates.
 
 ```json
