@@ -58,15 +58,12 @@ It follows the same integration style as the Personal Loan journey and adds Gold
     "pincode": "560001"
   },
   goldLoan: {
-    userType: "individual",
+    userType: individual,
     constitution: null,
     jewelleryWeightGrams: 52,
     purity: 22K,
-    endUse: "medicalTreatmentAndEmergencies",
+    endUse: medicalTreatmentAndEmergencies,
     bureauConsent: true,
-    aaID: 9876543210@finvu,
-    requestedAmount: 400000,
-    requestedTenureMonths: 5
   }
 }
 ```
@@ -157,10 +154,12 @@ curl --request POST "${PLATFORM_BASE_URL}/api/lab/sessions" \
       "pan": "ABCDE1234F"
     },
     goldLoan: {
+      userType: individual,
+      constitution: null,
       jewelleryWeightGrams: 52,
-      purity: "22K",
-      endUse: "businessExpansion",
-      bureauConsent: true
+      purity: 22K,
+      endUse: medicalTreatmentAndEmergencies,
+      bureauConsent: true,
     }
   }'
 ```
@@ -637,16 +636,13 @@ journeys: [
         state: // *Example:* `Gujarat`,
         pincode: // *Example:* `360001`,
       },
-      "goldLoan": {
-        "userType": "individual",
-        "constitution": null,
-        "jewelleryWeightGrams": 52,
-        "purity": "22K",
-        "endUse": "medicalTreatmentAndEmergencies",
-        "bureauConsent": true,
-        "aaID": "9876543210@finvu",
-        "requestedAmount": "400000",
-        "requestedTenureMonths": 5
+      goldLoan: {
+        userType: individual | non-individual,
+        constitution: null,
+        jewelleryWeightGrams: 52,
+        purity: 22K,
+        endUse: medicalTreatmentAndEmergencies,
+        bureauConsent: true,
       }
     },
     journeys: [
@@ -731,27 +727,27 @@ journeys: [
         ],
       },
     ],
-    "locations": [
+    locations: [
       {
-        "id": "L1",
-        "gps": "28.574909, 77.194029",
-        "name": "Mumbai Central"
-        "address": "123 Marine Drive, Mumbai, Maharashtra",
-        "area_code": "400001"
+        id: L1,
+        gps: 28.574909, 77.194029,
+        name: Mumbai Central,
+        address: 123 Marine Drive, Mumbai, Maharashtra,
+        area_code: 400001
       },
       {
-        "id": "L2",
-        "gps": "28.584909, 77.134029",
-        "name": "Mumbai East"
-        "address": "162 Dadar, Mumbai, Maharashtra",
-        "area_code": "400001"
+        id: L2,
+        gps: 28.584909, 77.134029,
+        name: Mumbai East,
+        address: 162 Dadar, Mumbai, Maharashtra,
+        area_code: 400001
       },
       {
-        "id": "L3",
-        "gps": "28.584909, 77.134029",
-        "name": "Mumbai West",
-        "address": "182 Juhu, Mumbai, Maharashtra",
-        "area_code": "400001"
+        id: L3,
+        gps: 28.584909, 77.134029,
+        name: Mumbai West,
+        address: 182 Juhu, Mumbai, Maharashtra,
+        area_code: 400001
       }
     ],
   },
@@ -792,16 +788,13 @@ journeys: [
         state: // *Example:* `Gujarat`,
         pincode: // *Example:* `360001`,
       },
-      "goldLoan": {
-        "userType": "individual",
-        "constitution": null,
-        "jewelleryWeightGrams": 52,
-        "purity": "22K",
-        "endUse": "medicalTreatmentAndEmergencies",
-        "bureauConsent": true,
-        "aaID": "9876543210@finvu",
-        "requestedAmount": "400000",
-        "requestedTenureMonths": 5
+      goldLoan: {
+        userType: individual,
+        constitution: null,
+        jewelleryWeightGrams: 52,
+        purity: 22K,
+        endUse: medicalTreatmentAndEmergencies,
+        bureauConsent: true,
       }
     },
     journeys: [
@@ -923,17 +916,14 @@ journeys: [
         state: // *Example:* `Gujarat`,
         pincode: // *Example:* `360001`,
       },
-      "goldLoan": {
-          "userType": "individual",
-          "constitution": null,
-          "jewelleryWeightGrams": 52,
-          "purity": "22K",
-          "endUse": "medicalTreatmentAndEmergencies",
-          "bureauConsent": true,
-          "aaID": "9876543210@finvu",
-          "requestedAmount": "400000",
-          "requestedTenureMonths": 5
-        }
+      goldLoan: {
+        userType: individual,
+        constitution: null,
+        jewelleryWeightGrams: 52,
+        purity: 22K,
+        endUse: medicalTreatmentAndEmergencies,
+        bureauConsent: true,
+      }
     },
     journeys: [
       {
@@ -1064,16 +1054,13 @@ Frequent post-disbursal event for installment state updates.
         state: // *Example:* `Gujarat`,
         pincode: // *Example:* `360001`,
       },
-      "goldLoan": {
-        "userType": "individual",
-        "constitution": null,
-        "jewelleryWeightGrams": 52,
-        "purity": "22K",
-        "endUse": "medicalTreatmentAndEmergencies",
-        "bureauConsent": true,
-        "aaID": "9876543210@finvu",
-        "requestedAmount": "400000",
-        "requestedTenureMonths": 5
+      goldLoan: {
+        userType: individual,
+        constitution: null,
+        jewelleryWeightGrams: 52,
+        purity: 22K,
+        endUse: medicalTreatmentAndEmergencies,
+        bureauConsent: true,
       }
     },
     journeys: [
